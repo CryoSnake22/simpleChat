@@ -22,7 +22,7 @@ public class EchoServer extends AbstractServer
   /**
    * The default port to listen on.
    */
-  final public static int DEFAULT_PORT = 5555;
+  final public static int DEFAULT_PORT = 6666;
   
   //Constructors ****************************************************
   
@@ -62,6 +62,18 @@ public class EchoServer extends AbstractServer
       ("Server listening for connections on port " + getPort());
   }
   
+	@Override
+	protected void clientConnected(ConnectionToClient client) {
+	  super.clientConnected(client);
+	  System.out.println(">> Client connected: "
+		  + client.getInetAddress().getHostAddress());
+	}
+	@Override
+	  protected void clientDisconnected(ConnectionToClient client) {
+	    super.clientDisconnected(client);
+	    System.out.println("<< Client disconnected: "
+	        + client.getInetAddress().getHostAddress());
+	 }
   /**
    * This method overrides the one in the superclass.  Called
    * when the server stops listening for connections.
