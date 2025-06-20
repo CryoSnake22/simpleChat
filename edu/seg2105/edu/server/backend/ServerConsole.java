@@ -25,7 +25,7 @@ public class ServerConsole implements ChatIF
   /**
    * The default port to connect on.
    */
-  final public static int DEFAULT_PORT = 6666;
+  final public static int DEFAULT_PORT = 5555;
   
   //Instance variables **********************************************
   
@@ -169,7 +169,7 @@ public class ServerConsole implements ChatIF
   public static void main(String[] args) 
   {
     String host = "";
-    int port = DEFAULT_PORT;
+    int port;
 
     try
     {
@@ -181,6 +181,14 @@ public class ServerConsole implements ChatIF
     catch(ArrayIndexOutOfBoundsException e)
     {
       host = "localhost";
+    }
+    try
+    {
+      port = Integer.parseInt(args[0]); //Get port from command line
+    }
+    catch(Throwable t)
+    {
+      port = DEFAULT_PORT; //Set port to 5555
     }
     EchoServer server = new EchoServer(port);
     try {

@@ -4,6 +4,8 @@ package edu.seg2105.edu.server.backend;
 // license found at www.lloseng.com 
 
 
+import java.io.IOException;
+
 import ocsf.server.*;
 
 /**
@@ -22,10 +24,10 @@ public class EchoServer extends AbstractServer
   /**
    * The default port to listen on.
    */
-  final public static int DEFAULT_PORT = 6666;
+  final public static int DEFAULT_PORT = 5555;
   
   //Constructors ****************************************************
-  
+  private String currLogin;
   /**
    * Constructs an instance of the echo server.
    *
@@ -48,8 +50,42 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+	String[] spl = msg.toString().split(" ");
+	this.currLogin = (String) client.getInfo("login");
+	
+	if (currLogin == null) {
+		if (spl[0].equals("#login")) {
+			String loginId = spl[1].trim();
+			client.setInfo("login", loginId);
+			try {
+				System.out.println("Message received: " + msg + " from " + currLogin);
+				client.sendToClient(loginId+" has logged on.");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				client.sendToClient("Error: must login first, terminating connection");
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return;
+		
+	} else {	
+		if (spl[0].equals("#login")) {		
+			try {
+				client.sendToClient("Error: user already logged in, terminating connection");
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return;
+		} 	
+	}
+	System.out.println("Message received: " + msg + " from " + currLogin);
+	this.sendToAllClients(currLogin + "> "+msg);
   }
     
   /**
@@ -108,7 +144,6 @@ public class EchoServer extends AbstractServer
     }
 	
     EchoServer sv = new EchoServer(port);
-    
     try 
     {
       sv.listen(); //Start listening for connections
